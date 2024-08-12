@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useSocket } from "./contexts/SocketProvider";
 
 export const Chat = () => {
   const [username, setUsername] = useState("");
@@ -7,11 +8,11 @@ export const Chat = () => {
   const [messages, setMessages] = useState<
     { timestamp: any; username: any; message: any }[]
   >([]);
+  const socket = useSocket();
 
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:3000");
-
-    ws.onmessage = (event) => {
+    if (!socket) return;
+    socket.onmessage = (event) => {
       const message = JSON.parse(event.data);
       setMessages((prevMessages) => [
         ...prevMessages,
@@ -24,15 +25,14 @@ export const Chat = () => {
     };
 
     return () => {
-      ws.close();
+      socket.close();
     };
-  }, []);
+  }, [socket]);
 
   const sendMessage = () => {
-    const ws = new WebSocket("ws://localhost:3000");
-    ws.onopen = () => {
-      ws.send(JSON.stringify({ username, message }));
-    };
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify({ username, message }));
+    }
   };
 
   return (

@@ -5,6 +5,8 @@ import styles from "./page.module.css";
 import { Button } from "@repo/ui/button";
 import { Chat } from "./chat";
 
+import { SocketProvider } from "./contexts/SocketProvider";
+
 function Gradient({
   conic,
   className,
@@ -140,7 +142,9 @@ export default function Page(): JSX.Element {
           </Card>
         ))}
       </div> */}
-      <Chat />
+      <SocketProvider>
+        <Chat />
+      </SocketProvider>
     </main>
   );
 }
