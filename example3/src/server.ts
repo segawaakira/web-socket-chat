@@ -32,25 +32,39 @@ wss.on("connection", (ws) => {
     });
 
   ws.on("message", (data) => {
-    const message: ChatMessage = JSON.parse(data.toString());
-    message.timestamp = Date.now();
-    const messageString = JSON.stringify(message);
+    const message = JSON.parse(data.toString());
 
-    // Save message to Redis
-    redisClient.rPush("chat_messages", messageString);
-    redisClient.lTrim("chat_messages", -100, -1); // Keep only the last 100 messages
+    if (message.type === "typing") {
+      // Broadcast typing message to all clients except the sender
+      wss.clients.forEach((client) => {
+        if (
+          client !== ws &&
+          client.readyState === ws.OPEN &&
+          message.username !== ""
+        ) {
+          client.send(
+            JSON.stringify({ type: "typing", username: message.username })
+          );
+        }
+      });
+    } else if (message.type === "message") {
+      message.timestamp = Date.now();
+      const messageString = JSON.stringify(message);
 
-    // Broadcast message to all clients
-    wss.clients.forEach((client) => {
-      if (client.readyState === ws.OPEN) {
-        client.send(messageString);
-      }
-    });
+      // Save message to Redis
+      redisClient.rPush("chat_messages", messageString);
+      redisClient.lTrim("chat_messages", -100, -1); // Keep only the last 100 messages
+
+      // Broadcast message to all clients
+      wss.clients.forEach((client) => {
+        if (client.readyState === ws.OPEN) {
+          client.send(messageString);
+        }
+      });
+    }
   });
 
   ws.on("close", () => {
     console.log("Client disconnected");
   });
 });
-
-console.log("WebSocket server is running on ws://localhost:3000");
