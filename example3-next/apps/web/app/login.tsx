@@ -1,14 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { useSocket } from "./contexts/SocketProvider";
-import { Chat } from "./chat";
-
-function getCookie(name: string): string | null {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
-  return null;
-}
+import React, { useState } from "react";
 
 export const Login = () => {
   const [name, setName] = useState("");

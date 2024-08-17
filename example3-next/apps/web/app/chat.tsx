@@ -12,7 +12,6 @@ function getCookie(name: string): string | null {
 
 export const Chat = () => {
   const [name, setName] = useState<string | null>(null);
-  const [username, setUsername] = useState("");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<
     { timestamp: any; username: any; message: any }[]
@@ -27,23 +26,25 @@ export const Chat = () => {
     if (!socket) return;
 
     socket.onmessage = (event) => {
+      console.log(event.data);
       const message = JSON.parse(event.data);
       if (message.type === "typing") {
-        setTyping(message.username);
+        setTyping(message.name);
+        setTimeout(() => {
+          setTyping(null);
+        }, 1000);
       } else {
         setMessages((prevMessages) => [
           ...prevMessages,
           {
             timestamp: message.timestamp,
-            username: message.username,
+            username: message.name,
             message: message.message,
           },
         ]);
         setTyping(null);
       }
     };
-
-    handleResetTyping();
 
     return () => {
       socket.close();
@@ -52,29 +53,20 @@ export const Chat = () => {
 
   const sendMessage = () => {
     if (socket && socket.readyState === WebSocket.OPEN) {
-      socket.send(JSON.stringify({ type: "message", username, message }));
+      socket.send(JSON.stringify({ type: "message", name, message }));
       setMessage("");
     }
   };
 
   const handleTyping = () => {
     if (socket && socket.readyState === WebSocket.OPEN) {
-      socket.send(JSON.stringify({ type: "typing", username }));
-    }
-  };
-
-  const handleResetTyping = () => {
-    if (socket && socket.readyState === WebSocket.OPEN) {
-      socket.send(JSON.stringify({ type: "typing", username: "" }));
+      socket.send(JSON.stringify({ type: "typing", name }));
     }
   };
 
   useEffect(() => {
-    if (username !== "" || message !== "") {
-      console.log("typing");
-      handleTyping();
-    }
-  }, [username, message]);
+    handleTyping();
+  }, [message]);
   return !name ? (
     <Login />
   ) : (
@@ -88,14 +80,6 @@ export const Chat = () => {
           </li>
         ))}
       </ul>
-      <input
-        id="username"
-        placeholder="Username"
-        value={username}
-        onChange={(e) => {
-          setUsername(e.target.value);
-        }}
-      />
       <input
         id="message"
         placeholder="Message"
