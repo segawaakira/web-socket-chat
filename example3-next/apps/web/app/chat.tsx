@@ -17,7 +17,7 @@ export const Chat = () => {
   const [messages, setMessages] = useState<
     { timestamp: any; username: any; message: any }[]
   >([]);
-  const [typing, setTyping] = useState<string | null>(null);
+  const [typings, setTypings] = useState<string[]>([]);
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const socket = useSocket();
 
@@ -36,9 +36,11 @@ export const Chat = () => {
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data);
       if (message.type === "typing") {
-        setTyping(message.name);
+        setTypings((prevTypings) => [...prevTypings, message.name]);
         setTimeout(() => {
-          setTyping(null);
+          setTypings((prevTypings) =>
+            prevTypings.filter((typingName) => typingName !== message.name)
+          );
         }, 1000);
       } else {
         setMessages((prevMessages) => [
@@ -49,7 +51,6 @@ export const Chat = () => {
             message: message.message,
           },
         ]);
-        setTyping(null);
       }
     };
 
@@ -77,7 +78,7 @@ export const Chat = () => {
       handleTyping();
       setTimeout(() => {
         setIsTyping(false);
-      }, 5000);
+      }, 1000);
     }
   }, [message]);
   return loading ? (
@@ -86,7 +87,7 @@ export const Chat = () => {
     <Login />
   ) : (
     <div id="chat">
-      {typing && <p>{typing} is typing...</p>}
+      {typings.length > 0 && <p>typing: {typings.join(", ")}</p>}
       <ul id="messages">
         {messages.map((msg, index) => (
           <li key={index}>
