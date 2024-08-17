@@ -1,8 +1,17 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useSocket } from "./contexts/SocketProvider";
+import { Login } from "./login";
+
+function getCookie(name: string): string | null {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
+  return null;
+}
 
 export const Chat = () => {
+  const [name, setName] = useState<string | null>(null);
   const [username, setUsername] = useState("");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<
@@ -11,6 +20,9 @@ export const Chat = () => {
   const [typing, setTyping] = useState<string | null>(null);
   const socket = useSocket();
 
+  useEffect(() => {
+    setName(getCookie("name"));
+  }, []);
   useEffect(() => {
     if (!socket) return;
 
@@ -63,8 +75,9 @@ export const Chat = () => {
       handleTyping();
     }
   }, [username, message]);
-
-  return (
+  return !name ? (
+    <Login />
+  ) : (
     <div id="chat">
       {typing && <p>{typing} is typing...</p>}
       <ul id="messages">
