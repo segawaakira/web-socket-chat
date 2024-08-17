@@ -11,12 +11,14 @@ function getCookie(name: string): string | null {
 }
 
 export const Chat = () => {
+  const [loading, setLoading] = useState(true);
   const [name, setName] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<
     { timestamp: any; username: any; message: any }[]
   >([]);
   const [typing, setTyping] = useState<string | null>(null);
+  const [isTyping, setIsTyping] = useState<boolean>(false);
   const socket = useSocket();
 
   useEffect(() => {
@@ -25,8 +27,13 @@ export const Chat = () => {
   useEffect(() => {
     if (!socket) return;
 
+    socket.onopen = () => {
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
+    };
+
     socket.onmessage = (event) => {
-      console.log(event.data);
       const message = JSON.parse(event.data);
       if (message.type === "typing") {
         setTyping(message.name);
@@ -65,9 +72,17 @@ export const Chat = () => {
   };
 
   useEffect(() => {
-    handleTyping();
+    if (!isTyping) {
+      setIsTyping(true);
+      handleTyping();
+      setTimeout(() => {
+        setIsTyping(false);
+      }, 5000);
+    }
   }, [message]);
-  return !name ? (
+  return loading ? (
+    <p>Loading...</p>
+  ) : !name ? (
     <Login />
   ) : (
     <div id="chat">
