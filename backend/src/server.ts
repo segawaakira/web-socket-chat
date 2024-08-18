@@ -17,8 +17,6 @@ const server = app.listen(port, () => {
 const wss = new WebSocketServer({ server });
 
 wss.on("connection", (ws) => {
-  console.log("Client connected");
-
   // Send chat history to new client
   redisClient
     .lRange("chat_messages", 0, -1)
@@ -34,34 +32,19 @@ wss.on("connection", (ws) => {
   ws.on("message", (data) => {
     const message = JSON.parse(data.toString());
 
-    if (message.type === "typing") {
-      console.log(`${message.name} is typing...`);
-      // Broadcast typing message to all clients except the sender
-      wss.clients.forEach((client) => {
-        if (
-          client !== ws &&
-          client.readyState === ws.OPEN &&
-          message.name !== ""
-        ) {
-          client.send(JSON.stringify({ type: "typing", name: message.name }));
-        }
-      });
-    } else if (message.type === "message") {
-      console.log(`${message.name} is typing...`);
-      message.timestamp = Date.now();
-      const messageString = JSON.stringify(message);
+    message.timestamp = Date.now();
+    const messageString = JSON.stringify(message);
 
-      // Save message to Redis
-      redisClient.rPush("chat_messages", messageString);
-      redisClient.lTrim("chat_messages", -100, -1); // Keep only the last 100 messages
+    // メッセージをRedisに保存
+    redisClient.rPush("chat_messages", messageString);
+    redisClient.lTrim("chat_messages", -100, -1); // Keep only the last 100 messages
 
-      // Broadcast message to all clients
-      wss.clients.forEach((client) => {
-        if (client.readyState === ws.OPEN) {
-          client.send(messageString);
-        }
-      });
-    }
+    // クライアントにブロードキャスト
+    wss.clients.forEach((client) => {
+      if (client.readyState === ws.OPEN) {
+        client.send(messageString);
+      }
+    });
   });
 
   ws.on("close", () => {
