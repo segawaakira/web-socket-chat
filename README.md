@@ -3,6 +3,7 @@
 - 起動
 
 ```bash
+cd backend
 docker-compose up
 ```
 
@@ -16,7 +17,10 @@ LRANGE chat_messages 0 -1
 
 ## frontend
 
+- 起動
+
 ```bash
+cd frontend
 pnpm install
 pnpm dev
 ```
