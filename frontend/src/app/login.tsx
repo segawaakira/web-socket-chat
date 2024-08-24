@@ -33,26 +33,28 @@ export const Login = () => {
   };
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-4"
-      >
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>ユーザー名</FormLabel>
-              <FormControl>
-                <Input placeholder="ユーザー名を入力" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit">ログイン</Button>
-      </form>
-    </Form>
+    <div className="w-full max-w-96">
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col gap-4"
+        >
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>ユーザー名</FormLabel>
+                <FormControl>
+                  <Input placeholder="ユーザー名を入力" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit">ログイン</Button>
+        </form>
+      </Form>
+    </div>
   );
 };
