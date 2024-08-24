@@ -13,6 +13,9 @@ pnpm install
 docker-compose up
 ```
 
+- URL
+  http://localhost:3000/
+
 - Redis のデータ確認
 
 ```bash
@@ -35,3 +38,6 @@ pnpm install
 ```bash
 pnpm dev
 ```
+
+- URL
+  http://localhost:3333/
