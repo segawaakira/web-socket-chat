@@ -1,9 +1,15 @@
 ## backend
 
-- 起動
+- インストール
 
 ```bash
 cd backend
+pnpm install
+```
+
+- 起動
+
+```bash
 docker-compose up
 ```
 
@@ -17,10 +23,15 @@ LRANGE chat_messages 0 -1
 
 ## frontend
 
-- 起動
+- インストール
 
 ```bash
 cd frontend
 pnpm install
+```
+
+- 起動
+
+```bash
 pnpm dev
 ```
