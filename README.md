@@ -1,4 +1,29 @@
-## backend
+## 概要
+
+- Web Socket と Redis を利用した、チャットアプリ
+- リアルタイムにメッセージのやり取りができて、入力中のユーザー名が表示されます
+
+---
+
+## スクリーンショット
+
+---
+
+## 使用技術
+
+- TypeScript
+- Next.js
+- shadcn/ui
+- Web Socket
+- Redis
+- Docker
+- express
+
+---
+
+## インストール 〜 起動
+
+### backend
 
 - インストール
 
@@ -24,7 +49,7 @@ redis-cli
 LRANGE chat_messages 0 -1
 ```
 
-## frontend
+### frontend
 
 - インストール
 
